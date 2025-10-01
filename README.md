@@ -1,52 +1,56 @@
-Arquitetura do Banco de Dados do Projeto
+# Diagrama ER do Sistema
 
-Abaixo está o Diagrama de Entidade-Relacionamento (ER) que descreve a estrutura dos nossos bancos de dados (Relacional e NoSQL).
+```mermaid
+erDiagram
+    usuarios {
+        UUID id PK
+        VARCHAR nome
+        VARCHAR email
+        TIMESTAMP criado_em
+    }
 
-erDiagram  
-    usuarios {  
-        UUID id PK  
-        VARCHAR nome  
-        VARCHAR email  
-        TIMESTAMP criado_em  
-    }  
-  
-    agentes {  
-        UUID id PK  
-        VARCHAR nome  
-        VARCHAR tipo  
-        TIMESTAMP criado_em  
-    }  
-  
-    relacoes_agentes {  
-        UUID id PK  
-        UUID agente_origem_id FK  
-        UUID agente_destino_id FK  
-        VARCHAR tipo_comunicacao  
-        TIMESTAMP criado_em  
-    }  
-  
-    interacoes {  
-        UUID id PK  
-        UUID usuario_id FK  
-        UUID agente_id FK  
-        TEXT prompt  
-        STRING resposta_id "FK para NoSQL"  
-        TIMESTAMP criado_em  
-    }  
-  
-    "respostas (NoSQL)" {  
-        STRING _id PK  
-        STRING interacaoId  
-        TEXT codigoGerado  
-        JSON arquivosGerados  
-        JSON logsAgentes  
-        STRING feedbackUsuario  
-        TIMESTAMP criadoEm  
-    }  
-  
-    usuarios ||--o{ interacoes : "inicia"  
-    agentes  ||--o{ interacoes : "participa"  
-    agentes  ||--o{ relacoes_agentes : "é origem de"  
-    agentes  ||--o{ relacoes_agentes : "é destino de"  
-    interacoes ||--|| "respostas (NoSQL)" : "gera"
+    agentes {
+        UUID id PK
+        VARCHAR nome
+        VARCHAR tipo
+        TIMESTAMP criado_em
+    }
 
+    conexoes {
+        UUID id PK
+        VARCHAR descricao
+        VARCHAR tipo_comunicacao
+        TIMESTAMP criado_em
+    }
+
+    conexao_agentes {
+        UUID id PK
+        UUID conexao_id FK
+        UUID agente_id FK
+        VARCHAR papel
+    }
+
+    interacoes {
+        UUID id PK
+        UUID usuario_id FK
+        UUID conexao_id FK
+        TEXT prompt
+        STRING resposta_id
+        TIMESTAMP criado_em
+    }
+
+    respostas {
+        STRING _id PK
+        STRING interacaoId
+        JSON codigoGerado
+        JSON arquivosGerados
+        JSON logsAgentes
+        STRING feedbackUsuario
+        TIMESTAMP criadoEm
+    }
+
+    usuarios ||--o{ interacoes : "inicia"
+    conexoes ||--o{ interacoes : "gera"
+    conexoes ||--o{ conexao_agentes : "tem"
+    agentes  ||--o{ conexao_agentes : "participa"
+    interacoes ||--|| respostas : "produz"

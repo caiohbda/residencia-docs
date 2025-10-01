@@ -47,8 +47,8 @@ erDiagram
 
     usuarios ||--o{ interacoes : "inicia"
     agentes  ||--o{ interacoes : "participa"
-    agentes  ||--o{ relacoes_agentes
-    agentes  ||--o{ relacoes_agentes
+    agentes  ||--o{ relacoes_agentes : "é origem de"
+    agentes  ||--o{ relacoes_agentes : "é destino de"
     interacoes ||--|| "respostas (NoSQL)" : "gera"
 ```
 

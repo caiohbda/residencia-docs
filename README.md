@@ -1,56 +1,61 @@
-# Diagrama ER do Sistema
+# 🧠 Sistema Multi-Agente – Esquema do Banco de Dados
+
+Este projeto utiliza uma arquitetura baseada em múltiplos agentes de IA para auxiliar em tarefas de desenvolvimento, testes e depuração.
+
+---
+
+## 📘 Esquema do Banco (ER Diagram)
 
 ```mermaid
 erDiagram
-    usuarios {
-        UUID id PK
+    USERS {
+        UUID id PK "gen_random_uuid()"
+        VARCHAR email "UNIQUE, NOT NULL"
         VARCHAR nome
-        VARCHAR email
-        TIMESTAMP criado_em
+        VARCHAR senha_hash
+        TIMESTAMP created_at "DEFAULT CURRENT_TIMESTAMP"
     }
 
-    agentes {
-        UUID id PK
-        VARCHAR nome
-        VARCHAR tipo
-        TIMESTAMP criado_em
+    AGENTS {
+        UUID id PK "gen_random_uuid()"
+        VARCHAR name
+        VARCHAR role
+        VARCHAR ai_provider
+        TEXT system_prompt
+        TIMESTAMP created_at "DEFAULT CURRENT_TIMESTAMP"
     }
 
-    conexoes {
-        UUID id PK
-        VARCHAR descricao
-        VARCHAR tipo_comunicacao
-        TIMESTAMP criado_em
+    PROJECTS {
+        UUID id PK "gen_random_uuid()"
+        UUID user_id FK
+        VARCHAR name
+        TEXT description
+        VARCHAR status "DEFAULT 'em_andamento'"
+        TIMESTAMP created_at "DEFAULT CURRENT_TIMESTAMP"
     }
 
-    conexao_agentes {
-        UUID id PK
-        UUID conexao_id FK
-        UUID agente_id FK
-        VARCHAR papel
+    TASKS {
+        UUID id PK "gen_random_uuid()"
+        UUID project_id FK
+        UUID agent_id FK
+        VARCHAR titulo
+        TEXT input_usuario
+        TEXT output_gerado
+        VARCHAR status "DEFAULT 'pendente'"
+        TIMESTAMP created_at "DEFAULT CURRENT_TIMESTAMP"
+        TIMESTAMP completed_at
     }
 
-    interacoes {
-        UUID id PK
-        UUID usuario_id FK
-        UUID conexao_id FK
-        TEXT prompt
-        STRING resposta_id
-        TIMESTAMP criado_em
+    IA_INTERACTIONS {
+        UUID id PK "gen_random_uuid()"
+        UUID task_id FK
+        JSONB messages
+        INTEGER tokens_usados
+        DECIMAL custo_estimado
+        TIMESTAMP created_at "DEFAULT CURRENT_TIMESTAMP"
     }
 
-    respostas {
-        STRING _id PK
-        STRING interacaoId
-        JSON codigoGerado
-        JSON arquivosGerados
-        JSON logsAgentes
-        STRING feedbackUsuario
-        TIMESTAMP criadoEm
-    }
-
-    usuarios ||--o{ interacoes : "inicia"
-    conexoes ||--o{ interacoes : "gera"
-    conexoes ||--o{ conexao_agentes : "tem"
-    agentes  ||--o{ conexao_agentes : "participa"
-    interacoes ||--|| respostas : "produz"
+    USERS ||--o{ PROJECTS : "possui"
+    PROJECTS ||--o{ TASKS : "contém"
+    AGENTS ||--o{ TASKS : "executa"
+    TASKS ||--o{ IA_INTERACTIONS : "registra"
